@@ -12,7 +12,8 @@ class App {
 
             const fighters = await fighterService.getFighters();
             const fightersElement = createFighters(fighters);
-
+            App.rootElement.innerHTML = '';
+            App.rootElement.addEventListener('restartApp', App.startApp);
             App.rootElement.appendChild(fightersElement);
         } catch (error) {
             console.warn(error);

@@ -1,13 +1,44 @@
 .fighter-preview___root {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 250px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 250px;
 }
 
 .fighter-preview___right {
-  align-items: flex-end;
+    align-items: flex-end;
 }
 
 .fighter-preview___left {
-  align-items: flex-start;
+    align-items: flex-start;
+}
+
+.fighter-name {
+    font-size: 1.5rem;
+    background: #ffdfa7;
+    color: #ba0303;
+    width: 100%;
+    text-align: center;
+}
+.fighter-property__container {
+    display: flex;
+    width: 100%;
+}
+
+.fighter-property__property-description {
+    width: 50%;
+    text-align: center;
+    background: #ffdfa7;
+    color: #ba0303;
+    font-size: 1.2 rem;
+    margin: 5px 0;
+}
+
+.fighter-property__barcontainer {
+    background-color: gainsboro;
+    width: 100%;
+    margin: 5px 0;
+}
+.fighter-bar {
+    height: 100%;
+    background-color: #ba0303;
 }
