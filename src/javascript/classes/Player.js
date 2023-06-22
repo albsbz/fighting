@@ -1,7 +1,7 @@
 import CriticalHitCombo from './CriticalHitCombo';
 
 export default class Player {
-    critical;
+    hitCritical;
 
     inBlock;
 
@@ -11,11 +11,14 @@ export default class Player {
 
     name;
 
-    constructor(fighter, name) {
+    controls;
+
+    constructor(fighter, name, controls) {
         this.name = name;
         this.health = fighter.health;
         this.hitCritical = new CriticalHitCombo();
-        this.inBlock = 0;
+        this.inBlock = false;
         this.fighter = fighter;
+        this.controls = controls;
     }
 }

@@ -20,73 +20,63 @@ export function getDamage(attacker, defender) {
 export async function fight(firstFighter, secondFighter) {
     return new Promise(resolve => {
         // resolve the promise with the winner when fight is over
-        const playerOne = new Player(firstFighter, 'one');
-        const playerTwo = new Player(secondFighter, 'two');
+        const players = [
+            new Player(firstFighter, 'one', {
+                attack: controls.PlayerOneAttack,
+                block: controls.PlayerOneBlock,
+                critical: controls.PlayerOneCriticalHitCombination
+            }),
+            new Player(secondFighter, 'two', {
+                attack: controls.PlayerTwoAttack,
+                block: controls.PlayerTwoBlock,
+                critical: controls.PlayerTwoCriticalHitCombination
+            })
+        ];
 
         function keyUpHandler(e) {
-            if (e.code === controls.PlayerOneBlock) {
-                playerOne.inBlock = false;
-            }
-            if (e.code === controls.PlayerTwoBlock) {
-                playerTwo.inBlock = false;
-            }
-            if (controls.PlayerOneCriticalHitCombination.includes(e.code)) {
-                playerOne.hitCritical.unpress(controls.PlayerOneCriticalHitCombination.indexOf(e.code));
-            }
-            if (controls.PlayerTwoCriticalHitCombination.includes(e.code)) {
-                playerOne.hitCritical.unpress(controls.PlayerTwoCriticalHitCombination.indexOf(e.code));
-            }
+            players.forEach((_, idx) => {
+                const player = players[idx];
+                if (e.code === player.controls.block) {
+                    player.inBlock = false;
+                }
+                if (player.controls.critical.includes(e.code)) {
+                    player.hitCritical.unpress(player.controls.critical.indexOf(e.code));
+                }
+            });
         }
         function keyDownHandler(e) {
             if (e.repeat) return;
-            if (e.code === controls.PlayerOneAttack) {
-                if (!playerOne.inBlock) {
-                    playerTwo.health -= getDamage(playerOne, playerTwo);
+            players.forEach((_, idx) => {
+                const player = players[idx];
+                const oponent = players[Math.abs(1 - idx)];
+
+                if (e.code === player.controls.attack) {
+                    if (!player.inBlock) {
+                        oponent.health -= getDamage(player, oponent);
+                    }
                 }
-            }
-            if (e.code === controls.PlayerTwoAttack) {
-                if (!playerTwo.inBlock) {
-                    playerOne.health -= getDamage(playerTwo, playerOne);
+                if (e.code === player.controls.block) {
+                    player.inBlock = true;
                 }
-            }
-            if (e.code === controls.PlayerOneBlock) {
-                playerOne.inBlock = true;
-            }
-            if (e.code === controls.PlayerTwoBlock) {
-                playerTwo.inBlock = true;
-            }
-            if (controls.PlayerOneCriticalHitCombination.includes(e.code)) {
-                const criticalHit = playerOne.hitCritical.press(
-                    controls.PlayerOneCriticalHitCombination.indexOf(e.code)
-                );
-                if (criticalHit) {
-                    playerTwo.health -= +playerOne.fighter.attack * 2;
+                if (player.controls.critical.includes(e.code)) {
+                    if (!player.inBlock) {
+                        const isCritical = player.hitCritical.press(player.controls.critical.indexOf(e.code));
+                        if (isCritical) {
+                            oponent.health -= +player.fighter.attack * 2;
+                        }
+                    }
                 }
-            }
-            if (controls.PlayerTwoCriticalHitCombination.includes(e.code)) {
-                const criticalHit = playerTwo.hitCritical.press(
-                    controls.PlayerTwoCriticalHitCombination.indexOf(e.code)
-                );
-                if (criticalHit) {
-                    playerOne.health -= +playerTwo.fighter.attack * 2;
+
+                document.getElementById(`${idx ? 'right' : 'left'}-fighter-indicator`).style.width = `${
+                    (player.health / player.fighter.health) * 100
+                }%`;
+
+                if (oponent.health < 1) {
+                    document.removeEventListener('keyup', keyUpHandler);
+                    document.removeEventListener('keydown', keyDownHandler);
+                    resolve(player);
                 }
-            }
-            document.getElementById('left-fighter-indicator').style.width = `${
-                (playerOne.health / playerOne.fighter.health) * 100
-            }%`;
-            document.getElementById('right-fighter-indicator').style.width = `${
-                (playerTwo.health / playerTwo.fighter.health) * 100
-            }%`;
-            if (playerTwo.health < 1) {
-                document.removeEventListener('keyup', keyUpHandler);
-                document.removeEventListener('keydown', keyDownHandler);
-                resolve(playerOne);
-            }
-            if (playerOne.health < 1) {
-                document.removeEventListener('keyup', keyUpHandler);
-                document.removeEventListener('keydown', keyDownHandler);
-                resolve(playerTwo);
-            }
+            });
         }
 
         document.addEventListener('keydown', keyDownHandler);

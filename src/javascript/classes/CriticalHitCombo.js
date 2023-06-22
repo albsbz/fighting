@@ -7,9 +7,11 @@ export default class CriticalHitCombo {
 
     press(buttonIdx) {
         const now = Date.now();
-        this.pressedButtons[buttonIdx] = true;
+        const pressedButtons = [...this.pressedButtons];
+        pressedButtons[buttonIdx] = true;
+        this.pressedButtons = pressedButtons;
         const comboPressed = this.pressedButtons.filter(i => i).length === 3;
-        const timeEnoughFromLastHit = now - this.lastHitTimestamp > MIN_TIME_BETWEEN_CRITICAL_HITS;
+        const timeEnoughFromLastHit = now - this.lastHitTimestamp >= MIN_TIME_BETWEEN_CRITICAL_HITS;
         const criticalHit = comboPressed && timeEnoughFromLastHit;
         if (criticalHit) {
             this.lastHitTimestamp = now;
